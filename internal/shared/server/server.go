@@ -10,8 +10,6 @@ import (
 	"github.com/goku-m/main/internal/shared/config"
 	"github.com/goku-m/main/internal/shared/database"
 	"github.com/goku-m/main/internal/shared/lib/job"
-	loggerPkg "github.com/goku-m/main/internal/shared/logger"
-	"github.com/newrelic/go-agent/v3/integrations/nrredis-v9"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 )
@@ -19,28 +17,22 @@ import (
 type Server struct {
 	Config        *config.Config
 	Logger        *zerolog.Logger
-	LoggerService *loggerPkg.LoggerService
 	DB            *database.Database
 	Redis         *redis.Client
 	httpServer    *http.Server
 	Job           *job.JobService
 }
 
-func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerPkg.LoggerService) (*Server, error) {
-	db, err := database.New(cfg, logger, loggerService)
+func New(cfg *config.Config, logger *zerolog.Logger) (*Server, error) {
+	db, err := database.New(cfg, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	// Redis client with New Relic integration
+	// Redis client
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: cfg.Redis.Address,
 	})
-
-	// Add New Relic Redis hooks if available
-	if loggerService != nil && loggerService.GetApplication() != nil {
-		redisClient.AddHook(nrredis.NewHook(redisClient.Options()))
-	}
 
 	// Test Redis connection
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -61,16 +53,12 @@ func New(cfg *config.Config, logger *zerolog.Logger, loggerService *loggerPkg.Lo
 	}
 
 	server := &Server{
-		Config:        cfg,
-		Logger:        logger,
-		LoggerService: loggerService,
-		DB:            db,
-		Redis:         redisClient,
-		Job:           jobService,
+		Config: cfg,
+		Logger: logger,
+		DB:     db,
+		Redis:  redisClient,
+		Job:    jobService,
 	}
-
-	// Start metrics collection
-	// Runtime metrics are automatically collected by New Relic Go agent
 
 	return server, nil
 }

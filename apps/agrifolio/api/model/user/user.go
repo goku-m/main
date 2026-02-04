@@ -1,4 +1,4 @@
-package site
+package user
 
 import (
 	"github.com/goku-m/main/apps/agrifolio/api/model"
@@ -6,7 +6,7 @@ import (
 
 type User struct {
 	model.Base
+	Name     string  `json:"name" db:"name"`
 	Email    string  `json:"email" db:"email"`
 	Password *string `json:"password" db:"password_hash"`
-	Plan     *string `json:"plan" db:"plan"`
 }

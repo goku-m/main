@@ -24,11 +24,7 @@ func main() {
 		panic("failed to load config: " + err.Error())
 	}
 
-	// Initialize New Relic logger service
-	loggerService := logger.NewLoggerService(cfg.Observability)
-	defer loggerService.Shutdown()
-
-	log := logger.NewLoggerWithService(cfg.Observability, loggerService)
+	log := logger.NewLogger(cfg.Observability)
 
 	if cfg.Primary.Env != "local" {
 		if err := database.Migrate(context.Background(), &log, cfg); err != nil {
@@ -37,7 +33,7 @@ func main() {
 	}
 
 	// Initialize server
-	srv, err := server.New(cfg, &log, loggerService)
+	srv, err := server.New(cfg, &log)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize server")
 	}

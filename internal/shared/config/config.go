@@ -17,7 +17,7 @@ type Config struct {
 	Database      DatabaseConfig       `koanf:"database" validate:"required"`
 	Auth          AuthConfig           `koanf:"auth" validate:"required"`
 	Redis         RedisConfig          `koanf:"redis" validate:"required"`
-	Integration   IntegrationConfig    `koanf:"integration" validate:"required"`
+	Integration   IntegrationConfig    `koanf:"integration" `
 	Observability *ObservabilityConfig `koanf:"observability"`
 }
 
@@ -30,7 +30,7 @@ type ServerConfig struct {
 	ReadTimeout        int      `koanf:"read_timeout" validate:"required"`
 	WriteTimeout       int      `koanf:"write_timeout" validate:"required"`
 	IdleTimeout        int      `koanf:"idle_timeout" validate:"required"`
-	CORSAllowedOrigins []string `koanf:"cors_allowed_origins" validate:"required"`
+	CORSAllowedOrigins []string `koanf:"cors_allowed_origins" `
 }
 
 type DatabaseConfig struct {
@@ -62,8 +62,8 @@ func LoadConfig() (*Config, error) {
 
 	k := koanf.New(".")
 
-	err := k.Load(env.Provider("APP_", ".", func(s string) string {
-		return strings.ToLower(strings.TrimPrefix(s, "APP_"))
+	err := k.Load(env.Provider("MAIN_", ".", func(s string) string {
+		return strings.ToLower(strings.TrimPrefix(s, "MAIN_"))
 	}), nil)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("could not load initial env variables")

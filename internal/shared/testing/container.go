@@ -105,7 +105,7 @@ func SetupTestDB(t *testing.T) (*TestDB, func()) {
 		// Sleep before first attempt too to give PostgreSQL time to initialize
 		time.Sleep(2 * time.Second)
 
-		db, lastErr = database.New(cfg, &logger, nil)
+		db, lastErr = database.New(cfg, &logger)
 		if lastErr == nil {
 			// Try a ping to verify the connection
 			if err := db.Pool.Ping(ctx); err == nil {

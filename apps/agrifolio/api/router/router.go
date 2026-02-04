@@ -46,8 +46,6 @@ func NewRouter(s *server.Server, h *handler.Handlers) *echo.Echo {
 		middlewares.Global.CORS(),
 		middlewares.Global.Secure(),
 		middleware.RequestID(),
-		middlewares.Tracing.NewRelicMiddleware(),
-		middlewares.Tracing.EnhanceTracing(),
 		middlewares.ContextEnhancer.EnhanceContext(),
 		middlewares.Global.RequestLogger(),
 		middlewares.Global.Recover(),
@@ -59,7 +57,7 @@ func NewRouter(s *server.Server, h *handler.Handlers) *echo.Echo {
 	registerPagesRoutes(router, h, middlewares.Auth)
 	// register api routes
 	r := router.Group("/api")
-	registerSiteRoutes(r, h.Site, middlewares.Auth)
+	registerUserRoutes(r, h.User, middlewares.Auth)
 
 	return router
 }

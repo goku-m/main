@@ -10,8 +10,8 @@ import (
 func registerPagesRoutes(r *echo.Echo, h *handler.Handlers, auth *middleware.AuthMiddleware) {
 
 	r.GET("/login", h.Auth.LoginPage)
-	r.GET("/", h.Site.GetSitePage)
-	r.GET("/create", h.Site.CreateSitePage)
+	r.GET("/", h.User.GetUserPage)
+	r.GET("/create", h.User.CreateUserPage)
 	r.Use(auth.RequireAuthIP)
-	r.GET("/update/:id", h.Site.UpdateSitePage)
+	r.GET("/update/:id", h.User.UpdateUserPage)
 }

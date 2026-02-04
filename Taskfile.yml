@@ -7,7 +7,7 @@ dotenv:
   - .env
 
 vars:
-  PROJECTS_DSN: '{{.PROJECTS_DSN | default ""}}'
+  MAIN_DSN: '{{.MAIN_DSN | default ""}}'
 
 tasks:
   help:
@@ -33,6 +33,7 @@ tasks:
     desc: create a new database migration
     vars:
       NAME: '{{.name | default ""}}'
+      PATH: '{{.path | default ""}}'
     cmds:
       - |
         if [ -z "{{.NAME}}" ]; then
@@ -40,16 +41,30 @@ tasks:
           echo "Usage: task migrations:new name=migration_name"
           exit 1
         fi
+        if [ -z "{{.PATH}}" ]; then
+          echo "Error: path parameter is required"
+          echo "Usage: task migrations:up path=path_name"
+          exit 1
+        fi
       - echo 'Creating migration file for {{.NAME}}...'
-      - tern new -m ./internal/shared/database/migrations {{.NAME}}
+      - tern new -m ./internal/shared/database/migrations/{{.PATH}} {{.NAME}}
 
   migrations:up:
     desc: apply all up database migrations
-   
+    vars:
+      PATH: '{{.path | default ""}}'
     cmds:
-      - echo 'Running up migrations...'
-      -  echo "PROJECTS_DSN='{{.PROJECTS_DSN}}'"
-      - tern migrate -m ./internal/shared/database/migrations --conn-string {{.PROJECTS_DSN}}
+      - |
+        if [ -z "{{.PATH}}" ]; then
+          echo "Error: path parameter is required"
+          echo "Usage: task migrations:up path=path_name"
+          exit 1
+        fi
+      - |
+        p="{{.PATH}}"
+        schema_table="schema_version_${p##*/}"
+        echo "Running up migrations (schema table: ${schema_table})..."
+        tern migrate -m ./internal/shared/database/migrations/{{.PATH}} --version-table "${schema_table}" --conn-string {{.MAIN_DSN}}
 
   tidy:
     desc: format all .go files, and tidy and vendor module dependencies

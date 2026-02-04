@@ -1,6 +1,6 @@
 {{extends "./layouts/base.jet"}}
 
-{{block browserTitle()}}Add Site{{end}}
+{{block browserTitle()}}Add User{{end}}
 
 {{block pageContent()}}
 
@@ -8,7 +8,7 @@
 
 
 
-<form method="POST" action="/agrifolio/api/sites/create">
+<form method="POST" action="/agrifolio/api/users/create">
   <div style="margin-bottom: 1rem;">
     <label>Title</label><br>
     <input type="text" name="title" class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded   block w-full px-3 py-2.5 shadow-xs placeholder:text-body" required>

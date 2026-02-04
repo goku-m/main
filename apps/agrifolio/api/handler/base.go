@@ -7,8 +7,6 @@ import (
 	"github.com/goku-m/main/internal/shared/server"
 	"github.com/goku-m/main/internal/shared/validation"
 	"github.com/labstack/echo/v4"
-	"github.com/newrelic/go-agent/v3/integrations/nrpkgerrors"
-	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 // Handler provides base functionality for all handlers
@@ -31,7 +29,6 @@ type HandlerFuncNoContent[Req validation.Validatable] func(c echo.Context, req R
 type ResponseHandler interface {
 	Handle(c echo.Context, result interface{}) error
 	GetOperation() string
-	AddAttributes(txn *newrelic.Transaction, result interface{})
 }
 
 // JSONResponseHandler handles JSON responses
@@ -47,10 +44,6 @@ func (h JSONResponseHandler) GetOperation() string {
 	return "handler"
 }
 
-func (h JSONResponseHandler) AddAttributes(txn *newrelic.Transaction, result interface{}) {
-	// http.status_code is already set by tracing middleware
-}
-
 // NoContentResponseHandler handles no-content responses
 type NoContentResponseHandler struct {
 	status int
@@ -62,38 +55,6 @@ func (h NoContentResponseHandler) Handle(c echo.Context, result interface{}) err
 
 func (h NoContentResponseHandler) GetOperation() string {
 	return "handler_no_content"
-}
-
-func (h NoContentResponseHandler) AddAttributes(txn *newrelic.Transaction, result interface{}) {
-	// http.status_code is already set by tracing middleware
-}
-
-// FileResponseHandler handles file responses
-type FileResponseHandler struct {
-	status      int
-	filename    string
-	contentType string
-}
-
-func (h FileResponseHandler) Handle(c echo.Context, result interface{}) error {
-	data := result.([]byte)
-	c.Response().Header().Set("Content-Disposition", "attachment; filename="+h.filename)
-	return c.Blob(h.status, h.contentType, data)
-}
-
-func (h FileResponseHandler) GetOperation() string {
-	return "handler_file"
-}
-
-func (h FileResponseHandler) AddAttributes(txn *newrelic.Transaction, result interface{}) {
-	if txn != nil {
-		// http.status_code is already set by tracing middleware
-		txn.AddAttribute("file.name", h.filename)
-		txn.AddAttribute("file.content_type", h.contentType)
-		if data, ok := result.([]byte); ok {
-			txn.AddAttribute("file.size_bytes", len(data))
-		}
-	}
 }
 
 // handleRequest is the unified handler function that eliminates code duplication
@@ -108,14 +69,6 @@ func handleRequest[Req validation.Validatable](
 	path := c.Path()
 	route := path
 
-	// Get New Relic transaction from context
-	txn := newrelic.FromContext(c.Request().Context())
-	if txn != nil {
-		txn.AddAttribute("handler.name", route)
-		// http.method and http.route are already set by nrecho middleware
-		responseHandler.AddAttributes(txn, nil)
-	}
-
 	// Get context-enhanced logger
 	loggerBuilder := middleware.GetLogger(c).With().
 		Str("operation", responseHandler.GetOperation()).
@@ -123,16 +76,7 @@ func handleRequest[Req validation.Validatable](
 		Str("path", path).
 		Str("route", route)
 
-	// Add file-specific fields to logger if it's a file handler
-	if fileHandler, ok := responseHandler.(FileResponseHandler); ok {
-		loggerBuilder = loggerBuilder.
-			Str("filename", fileHandler.filename).
-			Str("content_type", fileHandler.contentType)
-	}
-
 	logger := loggerBuilder.Logger()
-
-	// user.id is already set by tracing middleware
 
 	logger.Info().Msg("handling request")
 
@@ -146,19 +90,10 @@ func handleRequest[Req validation.Validatable](
 			Dur("validation_duration", validationDuration).
 			Msg("request validation failed")
 
-		if txn != nil {
-			txn.NoticeError(nrpkgerrors.Wrap(err))
-			txn.AddAttribute("validation.status", "failed")
-			txn.AddAttribute("validation.duration_ms", validationDuration.Milliseconds())
-		}
 		return err
 	}
 
 	validationDuration := time.Since(validationStart)
-	if txn != nil {
-		txn.AddAttribute("validation.status", "success")
-		txn.AddAttribute("validation.duration_ms", validationDuration.Milliseconds())
-	}
 
 	logger.Debug().
 		Dur("validation_duration", validationDuration).
@@ -178,24 +113,10 @@ func handleRequest[Req validation.Validatable](
 			Dur("total_duration", totalDuration).
 			Msg("handler execution failed")
 
-		if txn != nil {
-			txn.NoticeError(nrpkgerrors.Wrap(err))
-			txn.AddAttribute("handler.status", "error")
-			txn.AddAttribute("handler.duration_ms", handlerDuration.Milliseconds())
-			txn.AddAttribute("total.duration_ms", totalDuration.Milliseconds())
-		}
 		return err
 	}
 
 	totalDuration := time.Since(start)
-
-	// Record success metrics and tracing
-	if txn != nil {
-		txn.AddAttribute("handler.status", "success")
-		txn.AddAttribute("handler.duration_ms", handlerDuration.Milliseconds())
-		txn.AddAttribute("total.duration_ms", totalDuration.Milliseconds())
-		responseHandler.AddAttributes(txn, result)
-	}
 
 	logger.Info().
 		Dur("handler_duration", handlerDuration).
@@ -217,25 +138,6 @@ func Handle[Req validation.Validatable, Res any](
 		return handleRequest(c, req, func(c echo.Context, req Req) (interface{}, error) {
 			return handler(c, req)
 		}, JSONResponseHandler{status: status})
-	}
-}
-
-func HandleFile[Req validation.Validatable](
-	h Handler,
-	handler HandlerFunc[Req, []byte],
-	status int,
-	req Req,
-	filename string,
-	contentType string,
-) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return handleRequest(c, req, func(c echo.Context, req Req) (interface{}, error) {
-			return handler(c, req)
-		}, FileResponseHandler{
-			status:      status,
-			filename:    filename,
-			contentType: contentType,
-		})
 	}
 }
 

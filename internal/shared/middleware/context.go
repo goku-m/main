@@ -3,10 +3,8 @@ package middleware
 import (
 	"context"
 
-	"github.com/goku-m/main/internal/shared/logger"
 	"github.com/goku-m/main/internal/shared/server"
 	"github.com/labstack/echo/v4"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rs/zerolog"
 )
 
@@ -37,11 +35,6 @@ func (ce *ContextEnhancer) EnhanceContext() echo.MiddlewareFunc {
 				Str("path", c.Path()).
 				Str("ip", c.RealIP()).
 				Logger()
-
-			// Add trace context if available
-			if txn := newrelic.FromContext(c.Request().Context()); txn != nil {
-				contextLogger = logger.WithTraceContext(contextLogger, txn)
-			}
 
 			// Extract user information from JWT token or session
 			if userID := ce.extractUserID(c); userID != "" {

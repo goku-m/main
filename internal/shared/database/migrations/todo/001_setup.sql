@@ -1,3 +1,8 @@
+
+CREATE SCHEMA IF NOT EXISTS todo ;
+SET search_path TO todo, public;
+
+
 CREATE OR REPLACE FUNCTION camel(input_row anyelement)
     RETURNS jsonb
     LANGUAGE plpgsql

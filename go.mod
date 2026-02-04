@@ -15,12 +15,6 @@ require (
 	github.com/knadh/koanf/providers/env v1.1.0
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/newrelic/go-agent/v3 v3.40.1
-	github.com/newrelic/go-agent/v3/integrations/logcontext-v2/zerologWriter v1.0.4
-	github.com/newrelic/go-agent/v3/integrations/nrecho-v4 v1.1.4
-	github.com/newrelic/go-agent/v3/integrations/nrpgx5 v1.3.1
-	github.com/newrelic/go-agent/v3/integrations/nrpkgerrors v1.1.0
-	github.com/newrelic/go-agent/v3/integrations/nrredis-v9 v1.1.1
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/resend/resend-go/v2 v2.21.0
@@ -85,7 +79,6 @@ require (
 	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
-	github.com/newrelic/go-agent/v3/integrations/logcontext-v2/nrwriter v1.0.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

@@ -17,11 +17,11 @@
     <div class="mt-6 flow-root">
     
 
-{{ if len(.Data.sites) == 0 }}
-  <p>No sites yet.</p>
+{{ if len(.Data.users) == 0 }}
+  <p>No users yet.</p>
 {{ else }}
   <ul>
-    {{ range (.Data.sites) }}
+    {{ range (.Data.users) }}
       <li style="margin-bottom: 1rem;">
  <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 py-4 px-6">
   <div class="-my-6 divide-y divide-gray-200 dark:divide-gray-800">

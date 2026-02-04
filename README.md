@@ -52,11 +52,8 @@ backend/
 
 ### Observability
 
-- **New Relic APM**: Application performance monitoring
 - **Structured Logging**: JSON logs with Zerolog
-- **Request Tracing**: Distributed tracing support
 - **Health Checks**: Readiness and liveness endpoints
-- **Custom Metrics**: Business-specific monitoring
 
 ### Background Jobs
 
