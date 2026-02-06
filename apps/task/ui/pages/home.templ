@@ -1,0 +1,73 @@
+package pages
+
+import (
+  "github.com/goku-m/main/apps/task/ui/layout"
+  "github.com/goku-m/main/apps/task/ui/components"
+  "time"
+  "fmt"
+  )
+
+
+type TaskView struct {
+  ID string
+  Title string
+  Description string
+  Status string
+  Priority string
+  DueDate *time.Time
+}
+
+
+
+templ Home(tasks []TaskView) {
+@layout.Base("Home") {
+
+<div class="flex justify-end mb-4">
+@components.Button("green", "/task/create", "Add")
+</div>
+
+<div class="mt-6 flow-root">
+  if len(tasks) == 0 {
+  <p>No tasks yet.</p>
+  } else {
+  <ul>
+    for _, t := range tasks {
+  
+    
+
+    <li class="mb-4">
+      <div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 py-4 px-6">
+        <div class="-my-6 divide-y divide-gray-200 dark:divide-gray-800">
+          <div class="space-y-4 py-6 md:py-8">
+            <div class="grid gap-4">
+
+              if t.Priority != "" {
+              <div>
+                <span
+                  class="inline-block rounded bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
+                  {t.Priority}
+                </span>
+              </div>
+              }
+
+          <a href={ templ.URL(fmt.Sprintf("/task/update/%s", t.ID)) } class="text-xl font-semibold text-gray-900 dark:text-white">
+            {t.Title}
+          </a>
+            </div>
+
+            if t.Description != "" {
+            <p class="text-base font-normal text-gray-500 dark:text-gray-400">
+              {t.Description}
+            </p>
+            }
+          </div>
+        </div>
+      </div>
+    </li>
+    }
+  </ul>
+  }
+</div>
+
+}
+}

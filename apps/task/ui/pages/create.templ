@@ -1,0 +1,38 @@
+package pages
+
+import "github.com/goku-m/main/apps/task/ui/layout"
+
+templ CreateTask() {
+@layout.Base("Add User") {
+<form method="POST" action="/task/api/tasks/create">
+    <div class="mb-4">
+        <label>Title</label><br />
+        <input type="text" name="title" required
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded block w-full px-3 py-2.5 shadow-xs placeholder:text-body" />
+    </div>
+
+    <div class="mb-4">
+        <label>Description</label><br />
+        <textarea name="description" rows="4"
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body"></textarea>
+    </div>
+
+    <div class="mb-4">
+        <label>Priority</label><br />
+        <select name="priority"
+            class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+        </select>
+    </div>
+
+    <button type="submit"
+        class="inline-flex items-center rounded-md bg-green-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+        Create
+    </button>
+
+    <a href="/task" class="ml-3">Cancel</a>
+</form>
+}
+}

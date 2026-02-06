@@ -27,6 +27,7 @@ tasks:
   run:
     desc: run the cmd/apps gateway
     cmds:
+      - templ generate
       - go run ./cmd/apps
 
   migrations:new:

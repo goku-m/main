@@ -1,0 +1,63 @@
+package pages
+
+import "github.com/goku-m/main/apps/task/ui/layout"
+
+
+
+templ EditTask(task TaskView) {
+@layout.Base("Edit User") {
+
+<div class="flex justify-end mb-4">
+    <form method="POST" action="/task/api/tasks/delete">
+        <input type="hidden" name="id" value={task.ID} />
+        <button type="submit"
+            class="inline-flex items-center rounded-md bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+            Delete
+        </button>
+    </form>
+</div>
+
+<form method="POST" action={"/task/api/tasks/update/" + task.ID}>
+
+    <div class="mb-4">
+        <label for="title" class="block mb-2.5 text-sm font-medium text-heading">Title</label>
+        <input id="title" type="text" name="title" value={task.Title} required
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded block w-full px-3 py-2.5 shadow-xs placeholder:text-body" />
+    </div>
+
+    <div class="mb-4">
+        <label for="description" class="block mb-2.5 text-sm font-medium text-heading">Description</label>
+        <textarea id="description" name="description" rows="4"
+            class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body">{task.Description}</textarea>
+    </div>
+
+    <div class="mb-4">
+        <label>Priority</label><br />
+        <select name="priority"
+            class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
+            <option value="low" selected?={task.Priority=="low" }>low</option>
+            <option value="medium" selected?={task.Priority=="medium" }>medium</option>
+            <option value="high" selected?={task.Priority=="high" }>high</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label>Status</label><br />
+        <select name="status"
+            class="block w-full px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body">
+            <option value="draft" selected?={task.Status=="draft" }>draft</option>
+            <option value="active" selected?={task.Status=="active" }>active</option>
+            <option value="completed" selected?={task.Status=="completed" }>completed</option>
+            <option value="archived" selected?={task.Status=="archived" }>archived</option>
+        </select>
+    </div>
+
+    <button type="submit"
+        class="inline-flex items-center rounded-md bg-green-400 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+        Update
+    </button>
+
+    <a href="/task" class="ml-3">Cancel</a>
+</form>
+}
+}

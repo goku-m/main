@@ -8,7 +8,8 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/goku-m/main/apps/agrifolio"
+	"github.com/goku-m/main/apps/task"
+	"github.com/goku-m/main/apps/todo"
 	"github.com/goku-m/main/internal/gateway"
 	"github.com/goku-m/main/internal/shared/config"
 	"github.com/goku-m/main/internal/shared/database"
@@ -38,13 +39,18 @@ func main() {
 		log.Fatal().Err(err).Msg("failed to initialize server")
 	}
 
-	agrifolioModule, moduleErr := agrifolio.Module(srv)
+	todoModule, moduleErr := todo.Module(srv)
+	if moduleErr != nil {
+		log.Fatal().Err(moduleErr).Msg("could not initialize agrifolio module")
+	}
+
+	taskModule, moduleErr := task.Module(srv)
 	if moduleErr != nil {
 		log.Fatal().Err(moduleErr).Msg("could not initialize agrifolio module")
 	}
 
 	// Initialize gateway router
-	r := gateway.New(agrifolioModule)
+	r := gateway.New(todoModule, taskModule)
 
 	// Setup HTTP server
 	srv.SetupHTTPServer(r)

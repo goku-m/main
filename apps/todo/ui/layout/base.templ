@@ -1,0 +1,43 @@
+package layout
+
+templ Base(browserTitle string) {
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <title>todo - {browserTitle}</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Flowbite -->
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+    <link rel="icon" href="/favicon.ico" />
+</head>
+
+<body class="bg-gray-50 text-slate-900">
+    <header>
+        <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
+            <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+                <a href="/todo" class="flex items-center">
+                    <img src="/todo/public/images/t.png" class="mr-3 h-10 sm:h-9" alt="User Logo" />
+                    <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">2Do</span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+        <div class="mx-auto w-full max-w-3xl">
+            { children... }
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+</body>
+
+</html>
+}
